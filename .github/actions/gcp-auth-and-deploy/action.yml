@@ -51,8 +51,8 @@ runs:
       id: 'auth'
       uses: 'google-github-actions/auth@v2'
       with:
-        workload_identity_provider:  ${{ input.workload-identity-provider }}
-        service_account: ${{ input.sa }}
+        workload_identity_provider:  ${{ inputs.workload-identity-provider }}
+        service_account: ${{ inputs.sa }}
 
     - name: Setup gcloud
       uses: google-github-actions/setup-gcloud@v1
@@ -84,8 +84,8 @@ runs:
       if: success()
       uses: chrnorm/deployment-status@releases/v2
       with:
-        token: ${{ input.github-token }}
-        environment: ${{ input.environment }}
+        token: ${{ inputs.github-token }}
+        environment: ${{ inputs.environment }}
         deployment-id: ${{ steps.create_deployment.outputs.deployment_id }}
         state: 'success'
 
@@ -94,7 +94,7 @@ runs:
       if: failure()
       uses: chrnorm/deployment-status@releases/v2
       with:
-        token: ${{ input.github-token }}
-        environment: ${{ input.environment }}
+        token: ${{ inputs.github-token }}
+        environment: ${{ inputs.environment }}
         deployment-id: ${{ steps.create_deployment.outputs.deployment_id }}
         state: 'failure'
