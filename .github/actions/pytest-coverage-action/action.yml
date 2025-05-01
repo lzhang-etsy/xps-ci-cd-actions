@@ -70,19 +70,16 @@ runs:
       if: ${{ steps.find-comment.outputs.comment-id != '' }}
       uses: peter-evans/create-or-update-comment@v4
       with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        body-path: summary.txt
+        body-path: ${{ inputs.work-dir }}/summary.txt
         comment-id: ${{ steps.find-comment.outputs.comment-id }}
         edit-mode: replace
         reactions-edit-mode: replace
-      working-directory: ${{ inputs.work-dir }}
 
     - name: Create comment
       if: ${{ steps.find-comment.outputs.comment-id == '' }}
       uses: peter-evans/create-or-update-comment@v3
       with:
-        body-path: summary.txt
+        body-path:  ${{ inputs.work-dir }}/summary.txt
         issue-number: ${{ inputs.pr-number }}
         reactions: '+1'
-      working-directory: ${{ inputs.work-dir }}
 
