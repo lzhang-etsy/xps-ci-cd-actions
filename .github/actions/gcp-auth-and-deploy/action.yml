@@ -31,13 +31,14 @@ runs:
         python-version: '3.11'  # Specify the version of Python you need
 
     - name: Install dependencies
-      if: env.VERSION_CHANGED == 'true'
+      shell: bash
       run: |
         sudo apt-get update
         sudo apt-get install -y make
 
 
     - name: Configure git
+      shell: bash
       run: |
         git config user.name "github-actions[bot]"
         git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -58,6 +59,7 @@ runs:
       uses: google-github-actions/setup-gcloud@v1
 
     - name: Configure Docker for Artifact Registry
+      shell: bash
       run: |
         gcloud auth configure-docker us-central1-docker.pkg.dev
     
