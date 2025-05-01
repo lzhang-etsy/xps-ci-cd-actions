@@ -1,0 +1,88 @@
+name: 'Pytest & Coverage Reporter'
+description: 'Run tests and generate coverage summary'
+inputs:
+  pr-number:
+    description: 'PR number'
+    required: true
+  work-dir:
+    description: 'the root folder of the package'
+    required: true
+  package-name:
+    description: 'test package name run'
+    required: true
+  test-folder:
+    description: 'Folder to run tests from'
+    required: false
+    default: 'tests'
+  coverage-threshold:
+    description: 'Minimum coverage % to pass'
+    required: false
+    default: '70'
+
+runs:
+  using: "composite"
+  steps:
+    - name: Install dependencies
+      shell: bash
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pytest pytest-cov
+      working-directory: ${{ inputs.work-dir }}
+
+    - name: Build and Run Unit test
+      shell: bash
+      run: |
+        PYTHONPATH=src pytest ${{ inputs.test-folder }} \
+          --cov=${{ inputs.package-name }} \
+          --cov-report=term \
+          --cov-config=.coveragerc \
+          --cov-fail-under=${{ inputs.coverage-threshold }} \
+          -q | sed 's|src/||g' > coverage.txt
+      working-directory: ${{ inputs.work-dir }}
+
+    - name: Extract summary
+      shell: bash
+      id: extract
+      run: |
+        echo "<!-- pytest-report -->" > summary.txt
+        COVERAGE=$(awk '/^TOTAL/ {print $(NF)}' coverage.txt | sed 's/%//')
+        if (( $(echo "$COVERAGE >= 90" | bc -l) )); then
+          echo "### ✅ Pytest & Coverage Report" >> summary.txt
+        else
+          echo "### ❌ Pytest & Coverage Report" >> summary.txt
+        fi
+        echo '```' >> summary.txt
+        awk '/^Name.*Stmts.*Miss.*Cover/ {start=1} start' coverage.txt >> summary.txt
+        echo '```' >> summary.txt
+      working-directory: ${{ inputs.work-dir }}
+
+    - name: Find existing comment
+      id: find-comment
+      uses: peter-evans/find-comment@v3
+      continue-on-error: true
+      with:
+        issue-number: ${{ inputs.pr-number }}
+        comment-author: 'github-actions[bot]'
+        body-includes: '<!-- pytest-report -->'
+
+    - name: update PR comment
+      if: ${{ steps.find-comment.outputs.comment-id != '' }}
+      uses: peter-evans/create-or-update-comment@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        body-path: summary.txt
+        comment-id: ${{ steps.find-comment.outputs.comment-id }}
+        edit-mode: replace
+        reactions-edit-mode: replace
+      working-directory: ${{ inputs.work-dir }}
+
+    - name: Create comment
+      if: ${{ steps.find-comment.outputs.comment-id == '' }}
+      uses: peter-evans/create-or-update-comment@v3
+      with:
+        body-path: summary.txt
+        issue-number: ${{ inputs.pr-number }}
+        reactions: '+1'
+      working-directory: ${{ inputs.work-dir }}
+
