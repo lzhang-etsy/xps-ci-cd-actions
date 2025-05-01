@@ -48,9 +48,9 @@ runs:
         echo "<!-- pytest-report for ${{ inputs.package-name }} -->" > summary.txt
         COVERAGE=$(awk '/^TOTAL/ {print $(NF)}' coverage.txt | sed 's/%//')
         if (( $(echo "$COVERAGE >= ${{ inputs.coverage-threshold }}" | bc -l) )); then
-          echo "### ✅ Pytest & Coverage Report" >> summary.txt
+          echo "### ✅ Pytest & Coverage Report for ${{ inputs.package-name }}" >> summary.txt
         else
-          echo "### ❌ Pytest & Coverage Report" >> summary.txt
+          echo "### ❌ Pytest & Coverage Report for ${{ inputs.package-name }}" >> summary.txt
         fi
         echo '```' >> summary.txt
         awk '/^Name.*Stmts.*Miss.*Cover/ {start=1} start' coverage.txt >> summary.txt
@@ -64,7 +64,7 @@ runs:
       with:
         issue-number: ${{ inputs.pr-number }}
         comment-author: 'github-actions[bot]'
-        body-includes: '<!-- pytest-report -->'
+        body-includes: '<!-- pytest-report for ${{ inputs.package-name }} -->'
 
     - name: update PR comment
       if: ${{ steps.find-comment.outputs.comment-id != '' }}
