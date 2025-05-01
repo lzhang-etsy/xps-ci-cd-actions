@@ -45,7 +45,7 @@ runs:
       shell: bash
       id: extract
       run: |
-        echo "<!-- pytest-report -->" > summary.txt
+        echo "<!-- pytest-report for ${{ inputs.package-name }} -->" > summary.txt
         COVERAGE=$(awk '/^TOTAL/ {print $(NF)}' coverage.txt | sed 's/%//')
         if (( $(echo "$COVERAGE >= ${{ inputs.coverage-threshold }}" | bc -l) )); then
           echo "### ✅ Pytest & Coverage Report" >> summary.txt
