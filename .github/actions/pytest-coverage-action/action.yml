@@ -47,7 +47,7 @@ runs:
       run: |
         echo "<!-- pytest-report -->" > summary.txt
         COVERAGE=$(awk '/^TOTAL/ {print $(NF)}' coverage.txt | sed 's/%//')
-        if (( $(echo "$COVERAGE >= 90" | bc -l) )); then
+        if (( $(echo "$COVERAGE >= ${{ inputs.coverage-threshold }}" | bc -l) )); then
           echo "### ✅ Pytest & Coverage Report" >> summary.txt
         else
           echo "### ❌ Pytest & Coverage Report" >> summary.txt
