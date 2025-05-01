@@ -1,0 +1,100 @@
+name: 'gcp authr'
+description: 'Run gcp auth to grant permission for deploying'
+inputs:
+  sa:
+    description: 'service account'
+    required: true
+  workload-identity-provider:
+    description: 'workload identity provider'
+    required: true
+  run-command:
+    description: 'Command to run'
+    required: true
+  github-token:
+    description: 'GitHub token'
+    required: true
+  environment:
+    description: 'deploy environment'
+    required: false
+    default: development
+
+
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Python environment
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'  # Specify the version of Python you need
+
+    - name: Install dependencies
+      if: env.VERSION_CHANGED == 'true'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y make
+
+
+    - name: Configure git
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Fetch full history to compare branches
+
+    - name: GCP Auth
+      id: 'auth'
+      uses: 'google-github-actions/auth@v2'
+      with:
+        workload_identity_provider:  ${{ input.workload-identity-provider }}
+        service_account: ${{ input.sa }}
+
+    - name: Setup gcloud
+      uses: google-github-actions/setup-gcloud@v1
+
+    - name: Configure Docker for Artifact Registry
+      run: |
+        gcloud auth configure-docker us-central1-docker.pkg.dev
+    
+
+
+    - name: Create deployment
+      uses: chrnorm/deployment-action@releases/v1
+      id: create_deployment
+      with:
+        description: Deployment for ${GITHUB_REF#refs/heads/} # Include feature name in the description
+        environment: 'development' # Specify the environment
+        ref: ${{ github.ref }} # The branch ref
+      continue-on-error: true
+
+
+    - name: Build and Deploy
+      shell: bash
+      run: |
+        echo "Running user command:"
+        echo "${{ inputs.run-command }}"
+        eval "${{ inputs.run-command }}"
+
+    - name: Update deployment status (success)
+      if: success()
+      uses: chrnorm/deployment-status@releases/v2
+      with:
+        token: ${{ input.github-token }}
+        environment: ${{ input.environment }}
+        deployment-id: ${{ steps.create_deployment.outputs.deployment_id }}
+        state: 'success'
+
+
+    - name: Update deployment status (failure)
+      if: failure()
+      uses: chrnorm/deployment-status@releases/v2
+      with:
+        token: ${{ input.github-token }}
+        environment: ${{ input.environment }}
+        deployment-id: ${{ steps.create_deployment.outputs.deployment_id }}
+        state: 'failure'
