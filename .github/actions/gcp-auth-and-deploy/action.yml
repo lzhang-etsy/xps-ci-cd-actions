@@ -70,8 +70,9 @@ runs:
       id: create_deployment
       with:
         description: Deployment for ${GITHUB_REF#refs/heads/} # Include feature name in the description
-        environment: 'development' # Specify the environment
+        environment: '${{ inputs.environment }}' # Specify the environment
         ref: ${{ github.ref }} # The branch ref
+        token: ${{ inputs.github-token }} # GitHub token for
       continue-on-error: true
 
 
