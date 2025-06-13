@@ -56,7 +56,7 @@ runs:
         service_account: ${{ inputs.sa }}
 
     - name: Setup gcloud
-      uses: google-github-actions/setup-gcloud@v1
+      uses: google-github-actions/setup-gcloud@v2
 
     - name: Configure Docker for Artifact Registry
       shell: bash
