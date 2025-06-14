@@ -72,7 +72,7 @@ runs:
     - name: Get identity token
       shell: bash
       run: |
-        gcloud auth print-identity-token
+        - run: echo "ID_TOKEN=${{ steps.auth.outputs.id_token }}" >> $GITHUB_ENV
 
 
     - name: Create deployment
