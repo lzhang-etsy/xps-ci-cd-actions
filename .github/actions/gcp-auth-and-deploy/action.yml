@@ -54,6 +54,11 @@ runs:
       with:
         workload_identity_provider:  ${{ inputs.workload-identity-provider }}
         service_account: ${{ inputs.sa }}
+        token_format: id_token
+
+    - name: Get identity token
+      shell: bash
+      run: echo "ID_TOKEN=${{ steps.auth.outputs.id_token }}" >> $GITHUB_ENV
 
     - name: Setup gcloud
       uses: google-github-actions/setup-gcloud@v2
@@ -69,9 +74,6 @@ runs:
       shell: bash
       run: gcloud config set account ${{ inputs.sa }}
 
-    - name: Get identity token
-      shell: bash
-      run: echo "ID_TOKEN=${{ steps.auth.outputs.id_token }}" >> $GITHUB_ENV
 
 
     - name: Create deployment
