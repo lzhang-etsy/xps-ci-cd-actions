@@ -62,6 +62,8 @@ runs:
       shell: bash
       run: |
         gcloud auth configure-docker us-central1-docker.pkg.dev
+        gcloud auth list
+        gcloud config get-value account
     
 
 
