@@ -71,8 +71,7 @@ runs:
 
     - name: Get identity token
       shell: bash
-      run: |
-        - run: echo "ID_TOKEN=${{ steps.auth.outputs.id_token }}" >> $GITHUB_ENV
+      run: echo "ID_TOKEN=${{ steps.auth.outputs.id_token }}" >> $GITHUB_ENV
 
 
     - name: Create deployment
