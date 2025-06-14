@@ -64,7 +64,15 @@ runs:
         gcloud auth configure-docker us-central1-docker.pkg.dev
         gcloud auth list
         gcloud config get-value account
-    
+
+    - name: Set active account explicitly
+      shell: bash
+      run: gcloud config set account ${{ inputs.sa }}
+
+    - name: Get identity token
+      shell: bash
+      run: |
+        gcloud auth print-identity-token
 
 
     - name: Create deployment
