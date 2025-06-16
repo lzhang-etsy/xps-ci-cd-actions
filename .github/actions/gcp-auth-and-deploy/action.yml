@@ -54,12 +54,6 @@ runs:
       with:
         workload_identity_provider:  ${{ inputs.workload-identity-provider }}
         service_account: ${{ inputs.sa }}
-        token_format: id_token
-        id_token_audience: 'https://us-central1-etsy-xscitools-dev.cloudfunctions.net/enqueue_catapult_pdf_link'
-
-    - name: Get identity token
-      shell: bash
-      run: echo "ID_TOKEN=${{ steps.auth.outputs.id_token }}" >> $GITHUB_ENV
 
     - name: Setup gcloud
       uses: google-github-actions/setup-gcloud@v2
@@ -74,8 +68,6 @@ runs:
     - name: Set active account explicitly
       shell: bash
       run: gcloud config set account ${{ inputs.sa }}
-
-
 
     - name: Create deployment
       uses: chrnorm/deployment-action@releases/v1
