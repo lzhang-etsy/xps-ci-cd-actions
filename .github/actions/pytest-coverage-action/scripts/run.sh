@@ -1,20 +1,21 @@
 #!/bin/bash
 
 set -e
+set -o pipefail
 
 # Install dependencies
 cd "$WORK_DIR"
 python -m pip install --upgrade pip
 
 if [[ -n "$WORKLOAD_IDENTITY_PROVIDER" && -n "$SERVICE_ACCOUNT" ]]; then
-    pip install keyring && pip install keyrings.google-artifactregistry-auth
+  pip install keyrings.google
 fi
 
 pip install -r requirements.txt
 pip install pytest pytest-cov
 
 # Build and Run Unit test
-pytest  \
+pytest \
   --cov="$PACKAGE_NAME" \
   --cov-report=term \
   --cov-config=.coveragerc \

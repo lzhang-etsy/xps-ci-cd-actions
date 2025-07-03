@@ -10,10 +10,6 @@ inputs:
   package-name:
     description: 'test package name run'
     required: true
-  test-folder:
-    description: 'Folder to run tests from'
-    required: false
-    default: 'tests'
   coverage-threshold:
     description: 'Minimum coverage % to pass'
     required: false
