@@ -18,44 +18,34 @@ inputs:
     description: 'Minimum coverage % to pass'
     required: false
     default: '70'
-
+  workload_identity_provider:
+    description: 'The workload identity provider'
+    required: false
+  service_account:
+    description: 'The service account to use'
+    required: false
 runs:
   using: "composite"
   steps:
-    - name: Install dependencies
-      shell: bash
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-        pip install pytest pytest-cov
-      working-directory: ${{ inputs.work-dir }}
+    - name: 'Authenticate to Google Cloud'
+      if: ${{ inputs.workload_identity_provider != '' && inputs.service_account != '' }}
+      uses: 'google-github-actions/auth@v2'
+      with:
+        workload_identity_provider: ${{ inputs.workload_identity_provider }}
+        service_account: ${{ inputs.service_account }}
 
-    - name: Build and Run Unit test
+    - name: 'Run Tests and Generate Coverage'
       shell: bash
       run: |
-        PYTHONPATH=src pytest ${{ inputs.test-folder }} \
-          --cov=${{ inputs.package-name }} \
-          --cov-report=term \
-          --cov-config=.coveragerc \
-          --cov-fail-under=${{ inputs.coverage-threshold }} \
-          -q | sed 's|src/||g' > coverage.txt
-      working-directory: ${{ inputs.work-dir }}
-
-    - name: Extract summary
-      shell: bash
-      id: extract
-      run: |
-        echo "<!-- pytest-report for ${{ inputs.package-name }} -->" > summary.txt
-        COVERAGE=$(awk '/^TOTAL/ {print $(NF)}' coverage.txt | sed 's/%//')
-        if (( $(echo "$COVERAGE >= ${{ inputs.coverage-threshold }}" | bc -l) )); then
-          echo "### ✅ Pytest & Coverage Report for ${{ inputs.package-name }}" >> summary.txt
-        else
-          echo "### ❌ Pytest & Coverage Report for ${{ inputs.package-name }}" >> summary.txt
-        fi
-        echo '```' >> summary.txt
-        awk '/^Name.*Stmts.*Miss.*Cover/ {start=1} start' coverage.txt >> summary.txt
-        echo '```' >> summary.txt
-      working-directory: ${{ inputs.work-dir }}
+        ${{ github.action_path }}/scripts/run.sh
+      env:
+        PR_NUMBER: ${{ inputs.pr-number }}
+        WORK_DIR: ${{ inputs.work-dir }}
+        PACKAGE_NAME: ${{ inputs.package-name }}
+        TEST_FOLDER: ${{ inputs.test-folder }}
+        COVERAGE_THRESHOLD: ${{ inputs.coverage-threshold }}
+        WORKLOAD_IDENTITY_PROVIDER: ${{ inputs.workload_identity_provider }}
+        SERVICE_ACCOUNT: ${{ inputs.service_account }}
 
     - name: Find existing comment
       id: find-comment
