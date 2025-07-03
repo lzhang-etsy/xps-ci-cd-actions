@@ -33,6 +33,7 @@ runs:
     - name: 'Run Tests and Generate Coverage'
       shell: bash
       run: |
+        chmod +x ${{ github.action_path }}/scripts/run.sh
         ${{ github.action_path }}/scripts/run.sh
       env:
         PR_NUMBER: ${{ inputs.pr-number }}
