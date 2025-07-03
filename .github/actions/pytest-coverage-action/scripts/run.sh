@@ -8,7 +8,7 @@ cd "$WORK_DIR"
 python -m pip install --upgrade pip
 
 if [[ -n "$WORKLOAD_IDENTITY_PROVIDER" && -n "$SERVICE_ACCOUNT" ]]; then
-  pip install keyrings.google
+  pip install keyring && pip install keyrings.google-artifactregistry-auth
 fi
 
 pip install -r requirements.txt
