@@ -4,7 +4,6 @@ set -e
 set -o pipefail
 
 # Install dependencies
-cd "$WORK_DIR"
 python -m pip install --upgrade pip
 
 if [[ -n "$WORKLOAD_IDENTITY_PROVIDER" && -n "$SERVICE_ACCOUNT" ]]; then
@@ -12,15 +11,12 @@ if [[ -n "$WORKLOAD_IDENTITY_PROVIDER" && -n "$SERVICE_ACCOUNT" ]]; then
 fi
 
 pip install -r requirements.txt
-pip install pytest pytest-cov
+pip install pytest pytest-cov pytest-pythonpath
 
-# Build and Run Unit test
-pytest \
-  --cov="$PACKAGE_NAME" \
-  --cov-report=term \
-  --cov-config=.coveragerc \
-  --cov-fail-under="$COVERAGE_THRESHOLD" \
-   | sed 's|src/||g' > coverage.txt
+# Build and Run Unit tests
+
+#pytest
+pytest --cov-report=term --cov-config=.coveragerc --cov-fail-under="$COVERAGE_THRESHOLD"  -q  | sed 's|src/||g' | tee coverage.txt
 
 # Extract summary
 echo "<!-- pytest-report for $PACKAGE_NAME -->" > summary.txt

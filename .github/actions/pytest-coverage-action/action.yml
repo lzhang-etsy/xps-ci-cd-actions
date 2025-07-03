@@ -43,6 +43,7 @@ runs:
         COVERAGE_THRESHOLD: ${{ inputs.coverage-threshold }}
         WORKLOAD_IDENTITY_PROVIDER: ${{ inputs.workload_identity_provider }}
         SERVICE_ACCOUNT: ${{ inputs.service_account }}
+      working-directory: ${{ inputs.work-dir }}
 
     - name: Find existing comment
       id: find-comment
