@@ -20,7 +20,7 @@ pytest \
   --cov-report=term \
   --cov-config=.coveragerc \
   --cov-fail-under="$COVERAGE_THRESHOLD" \
-  -q | sed 's|src/||g' > coverage.txt
+   | sed 's|src/||g' > coverage.txt
 
 # Extract summary
 echo "<!-- pytest-report for $PACKAGE_NAME -->" > summary.txt
