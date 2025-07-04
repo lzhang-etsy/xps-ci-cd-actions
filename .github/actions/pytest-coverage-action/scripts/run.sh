@@ -10,11 +10,12 @@ python -m pip install --upgrade pip
 if [[ -n "$WORKLOAD_IDENTITY_PROVIDER" && -n "$SERVICE_ACCOUNT" ]]; then
   echo "Auth variables detected. Installing with Artifact Registry."
   python -m pip install keyring keyrings.google-artifactregistry-auth
-  python -m pip install --extra-index-url https://us-central1-python.pkg.dev/etsy-xscitools-dev/experimentation-pypi/simple -r requirements.txt
+  python -m pip install --extra-index-url https://us-central1-python.pkg.dev/etsy-xscitools-dev/experimentation-pypi/simple $(printf -- '-r %s ' requirements*.txt)
 else
   echo "No auth variables detected. Installing from standard index."
-  python -m pip install -r requirements.txt
+  python -m pip install $(printf -- '-r %s ' requirements*.txt)
 fi
+
 
 python -m pip install pytest pytest-cov pytest-pythonpath
 
