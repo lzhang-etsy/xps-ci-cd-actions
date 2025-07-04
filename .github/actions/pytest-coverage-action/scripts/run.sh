@@ -16,7 +16,7 @@ python -m pip install pytest pytest-cov pytest-pythonpath
 # Build and Run Unit tests
 
 #pytest
-pytest --cov-report=term --cov-config=.coveragerc --cov-fail-under="$COVERAGE_THRESHOLD"  -q  | sed 's|src/||g' | tee coverage.txt
+pytest --cov-report=term --cov-config=.coveragerc --cov-fail-under="$COVERAGE_THRESHOLD"  -vv  | sed 's|src/||g' | tee coverage.txt
 
 # Extract summary
 echo "<!-- pytest-report for $PACKAGE_NAME -->" > summary.txt
