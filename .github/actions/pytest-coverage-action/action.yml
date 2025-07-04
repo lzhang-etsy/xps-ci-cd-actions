@@ -39,9 +39,9 @@ runs:
       if: ${{ inputs.service_account != '' }}
       shell: bash
       run: |
-        gcloud artifacts print-settings python 
-          --project=etsy-xscitools-dev 
-          --repository=experimentation-pypi 
+        gcloud artifacts print-settings python \
+          --project=etsy-xscitools-dev \
+          --repository=experimentation-pypi  \
           --location=us-central1 >> ~/.pypirc
 
     - name: 'Run Tests or Skip'
