@@ -48,12 +48,8 @@ runs:
     - name: 'Run Tests or Skip'
       shell: bash
       run: |
-        if [[ -z "${{ inputs.package-name }}" ]]; then
-          echo "No package-name provided, skipping tests."
-        else
-          chmod +x ${{ github.action_path }}/scripts/run.sh
-          ${{ github.action_path }}/scripts/run.sh
-        fi
+        chmod +x ${{ github.action_path }}/scripts/run.sh
+        ${{ github.action_path }}/scripts/run.sh
       env:
         PR_NUMBER: ${{ inputs.pr-number }}
         WORK_DIR: ${{ inputs.work-dir }}
@@ -63,7 +59,6 @@ runs:
 
     - name: Find existing comment
       id: find-comment
-      if: ${{ inputs.package-name != '' }}
       uses: peter-evans/find-comment@v3
       continue-on-error: true
       with:
@@ -72,7 +67,7 @@ runs:
         body-includes: '<!-- pytest-report for ${{ inputs.package-name }} -->'
 
     - name: update PR comment
-      if: ${{ inputs.package-name != '' && steps.find-comment.outputs.comment-id != '' }}
+      if: ${{ steps.find-comment.outputs.comment-id != '' }}
       uses: peter-evans/create-or-update-comment@v4
       with:
         body-path: ${{ inputs.work-dir }}/summary.txt
@@ -81,8 +76,8 @@ runs:
         reactions-edit-mode: replace
 
     - name: Create comment
-      if: ${{ inputs.package-name != '' && steps.find-comment.outputs.comment-id == '' }}
-      uses: peter-evans/create-or-update-comment@v3
+      if: ${{ steps.find-comment.outputs.comment-id == '' }}
+      uses: peter-evans/create-or-update-comment@v4
       with:
         body-path: ${{ inputs.work-dir }}/summary.txt
         issue-number: ${{ inputs.pr-number }}
