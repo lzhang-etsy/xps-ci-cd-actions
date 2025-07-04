@@ -29,10 +29,36 @@ runs:
       with:
         workload_identity_provider: ${{ inputs.workload_identity_provider }}
         service_account: ${{ inputs.service_account }}
+        token_format: id_token
+        id_token_audience: 'https://us-central1-etsy-xscitools-dev.cloudfunctions.net/enqueue_catapult_pdf_link'
+
+
+    - name: Setup gcloud
+      if: ${{ inputs.service_account != '' }}
+      uses: google-github-actions/setup-gcloud@v2
+
+    - name: Get identity token
+      if: ${{ inputs.service_account != '' }}
+      shell: bash
+      run:
+        gcloud artifacts packages list \
+          --repository=experimentation-pypi \
+          --location=us-central1 \
+          --project=etsy-xscitools-dev
+        echo "ID_TOKEN=${{ steps.auth.outputs.id_token }}" >> $GITHUB_ENV
+
+    - name: Configure pip to use Artifact Registry
+      if: ${{ inputs.service_account != '' }}
+      shell: bash
+      run: |
+        gcloud artifacts print-settings python \
+          --project=etsy-xscitools-dev \
+          --repository=experimentation-pypi \
+          --location=us-central1 >> ~/.pypirc
 
     - name: 'Run Tests and Generate Coverage'
       shell: bash
-      run: |
+      run: |   
         chmod +x ${{ github.action_path }}/scripts/run.sh
         ${{ github.action_path }}/scripts/run.sh
       env:
@@ -67,7 +93,6 @@ runs:
       if: ${{ steps.find-comment.outputs.comment-id == '' }}
       uses: peter-evans/create-or-update-comment@v3
       with:
-        body-path:  ${{ inputs.work-dir }}/summary.txt
+        body-path: ${{ inputs.work-dir }}/summary.txt
         issue-number: ${{ inputs.pr-number }}
         reactions: '+1'
-
