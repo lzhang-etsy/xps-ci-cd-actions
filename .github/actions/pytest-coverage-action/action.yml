@@ -39,6 +39,7 @@ runs:
       if: ${{ inputs.service_account != '' }}
       shell: bash
       run: |
+        python -m pip install keyring  keyrings.google-artifactregistry-auth
         gcloud artifacts print-settings python \
           --project=etsy-xscitools-dev \
           --repository=experimentation-pypi  \
