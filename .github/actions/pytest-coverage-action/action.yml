@@ -20,6 +20,9 @@ inputs:
   service_account:
     description: 'The service account to use'
     required: false
+  id_token_audience:
+    description: 'The cloud function url'
+    required: false
 runs:
   using: "composite"
   steps:
@@ -30,6 +33,20 @@ runs:
       with:
         workload_identity_provider: ${{ inputs.workload_identity_provider }}
         service_account: ${{ inputs.service_account }}
+    - name: 'GCP Auth to cf'
+      id: 'auth_cf'
+      uses: 'google-github-actions/auth@v2'
+      if: ${{ inputs.id_token_audience != '' }}
+      with:
+        workload_identity_provider: ${{ inputs.workload_identity_provider }}
+        service_account: ${{ inputs.service_account }}
+        token_format: id_token
+        id_token_audience: ${{ inputs.id_token_audience }}
+
+    - name: Get identity token
+      if: ${{ inputs.id_token_audience != '' }}
+      shell: bash
+      run: echo "ID_TOKEN=${{ steps.auth_cf.outputs.id_token }}" >> $GITHUB_ENV
 
     - name: Setup gcloud
       if: ${{ inputs.service_account != '' }}
