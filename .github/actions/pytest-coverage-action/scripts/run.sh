@@ -4,7 +4,6 @@ set -e
 set -o pipefail
 
 # Install dependencies
-cd "$WORK_DIR"
 python -m pip install --upgrade pip
 
 # Check for auth variables and install dependencies accordingly
@@ -17,15 +16,11 @@ else
   python -m pip install -r requirements.txt
 fi
 
-python -m pip install pytest pytest-cov
+python -m pip install pytest pytest-cov pytest-pythonpath
 
 # Build and Run Unit test
-pytest -v -rA \
-  --cov="$PACKAGE_NAME" \
-  --cov-report=term \
-  --cov-config=.coveragerc \
-  --cov-fail-under="$COVERAGE_THRESHOLD" \
-  -q | sed 's|src/||g' > coverage.txt
+
+pytest --cov-report=term --cov-config=.coveragerc --cov-fail-under="$COVERAGE_THRESHOLD"  -vv --show-capture=all  -o log_cli=true -o log_cli_level=DEBUG | sed 's|src/||g' | tee coverage.txt
 
 # Extract summary
 echo "<!-- pytest-report for $PACKAGE_NAME -->" > summary.txt
