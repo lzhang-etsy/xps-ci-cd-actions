@@ -55,6 +55,8 @@ runs:
         WORK_DIR: ${{ inputs.work-dir }}
         PACKAGE_NAME: ${{ inputs.package-name }}
         COVERAGE_THRESHOLD: ${{ inputs.coverage-threshold }}
+        WORKLOAD_IDENTITY_PROVIDER: ${{ inputs.workload_identity_provider }}
+        SERVICE_ACCOUNT: ${{ inputs.service_account }}
       working-directory: ${{ inputs.work-dir }}
 
     - name: Find existing comment
