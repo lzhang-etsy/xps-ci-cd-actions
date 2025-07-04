@@ -7,11 +7,11 @@ set -o pipefail
 python -m pip install --upgrade pip
 
 if [[ -n "$WORKLOAD_IDENTITY_PROVIDER" && -n "$SERVICE_ACCOUNT" ]]; then
-  pip install keyring && pip install keyrings.google-artifactregistry-auth
+  python -m pip install keyring  keyrings.google-artifactregistry-auth
 fi
 
-pip install -r requirements.txt
-pip install pytest pytest-cov pytest-pythonpath
+python -m pip install -r requirements.txt
+python -m pip install pytest pytest-cov pytest-pythonpath
 
 # Build and Run Unit tests
 
